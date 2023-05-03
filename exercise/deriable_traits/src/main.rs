@@ -69,6 +69,20 @@ impl PartialEq for Puzzle {
 // 해시맵에서 Puzzle 을 키로 사용할 수 있다는 것 정도입니다.
 impl Eq for Puzzle {}
 
+// From  From<T> for U
+// From<Puzzle> for String
+// From 을 구현하면 Into 는 자동으로 구현됩니다
+// 하지만 Rust에서 자주 사용되는 건 Into trait과 제네릭 함수를 조합해서 사용하는 거죠
+impl From<&Puzzle> for String {
+    // 여기서도 복제를 하지만, Puzzle 전체를 복제 하는것 보다 훨씬 낫다.
+    fn from(puzzle: &Puzzle) -> Self {
+        puzzle.name.clone()
+    }
+}
+
+// Into  Into<U> for T
+// Into<String> for Puzzle
+
 fn main() {
     println!("Hello, world!");
     println!(
@@ -100,4 +114,25 @@ fn main() {
         ..Default::default()
     };
     println!("{:#?}", puzzle3);
+
+    let default_puzzle = Puzzle::default();
+    // show(fromPuzzle);
+    // 여기서 의 문제점은 From과 Into trait이 Puzzle을 소비한다는 겁니다.
+    // 그러면 puzzle을 복제한 값을 show() 함수에 전달하도록 바꾸면 되겠네요! 하면 근본적인 문제에 대한 해결책은 아니다.
+    // From trait이 Puzzle 구조체의 불변 참조 값을 사용하는 방식으로 변경하면 됩니다.
+    show(&default_puzzle);
+    // 불변 참조 값, 즉 확장 포인터가 show() 함수로 이동합니다.
+    // 새로운 문자열을 만드는 데 불변 참조 값을 사용하고 나면, show() 함수가 동작을 마쳤을 때
+    // 불변 참조 값은 범위를 벗어나 사라지겠지만, 우리가 처음에 만든 default_puzzle 변수는
+    // 여전히 남아있습니다.
+    println!("{:#?}", default_puzzle);
+    // 이를 통해 타입의 참조 값에는 자기만의 타입이 있다는 걸 다시 한번 확인할 수 있습니다.
+    // 그래서 타입 정의 자체에 불변 또는 가변 참조를 포함하고 있는 타입의 trait 도 구현할 수 있습니다.
+    // 다른 관점으로는
+    // 참조 값은 자신이 참조하는 대상의 trait 과 상관없이 자기만의 trait 을 가질 수 있습니다.
+}
+
+// 인수로 T 타입의 's'를 받습니다. T는 Into<String>이 구현된 타입이면 뭐든지 가능합니다
+pub fn show<T: Into<String>>(s: T) {
+    println!("{}", s.into());
 }
