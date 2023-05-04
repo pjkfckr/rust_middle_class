@@ -1,3 +1,6 @@
+mod practice;
+
+pub use practice::*;
 // Doc-tests
 // use 문 앞에 있는 '#' 앞 뒤로 공백이 존재하는데 이는 문서에 표시되지 않게 작성하는 방법이다.
 /// # Example
