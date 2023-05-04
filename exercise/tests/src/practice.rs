@@ -1,14 +1,16 @@
 pub fn sploosh(x: i32, y: i32, z: i32) -> i32 {
+    if x < 0 {
+        return 99;
+    }
     match (x, y, z) {
-        (x, _, _) if x < 0 => 99,
         (1, 2, 3) => 4,
         (5, 6, 7) => 3,
-        (x, y, z) => x + y - z,
+        _ => x + y - z,
     }
 }
 
 pub fn splish(a: i32, b: i32) -> i32 {
-    -a + 3 * b
+    -(a) + (3 * b)
 }
 
 // 1. Use the `cfg` attribute to mark the `test` module below as a test module
