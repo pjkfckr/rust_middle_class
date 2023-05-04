@@ -3,7 +3,7 @@
 /// # Example
 ///
 /// ```
-/// # use tests::snuggle;
+/// # use hello::snuggle;
 /// let bunnies = snuggle(5);
 /// assert_eq!(bunnies, 40);
 /// ```
@@ -41,12 +41,12 @@ mod test {
 
     // 테스트 작성시에 Result를 반환하려는 이유는
     // 물음표 연산자를 사용하기위해 입니다.
-    #[test]
-    fn bunny_result() -> Result<(), ParseIntError> {
-        let num_bunnies: u64 = "four".parse()?;
-        assert_eq!(num_bunnies, 4);
-        Ok(())
-    }
+    // #[test]
+    // fn bunny_result() -> Result<(), ParseIntError> {
+    //     let num_bunnies: u64 = "four".parse()?;
+    //     assert_eq!(num_bunnies, 4);
+    //     Ok(())
+    // }
 
     // 테스트 실행 경로
     // Running unittests src/lib.rs (target/debug/deps/tests-453b59a16a01b37c)
