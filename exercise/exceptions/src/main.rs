@@ -52,6 +52,8 @@ use std::num::IntErrorKind;
 // #5: Debug + Display + Error
 // #5b: Use thiserror
 
+mod lib;
+
 pub enum FractalError {
     SadSnowFlake,
 }
