@@ -1,3 +1,4 @@
+use rand::prelude::*;
 use rusty_engine::prelude::*;
 
 // 게임용 데이터를 저장할 위치가 필요할텐데, 엔진의 일부는 아니지만,
@@ -8,7 +9,7 @@ struct GameState {
     high_score: u32,
     score: u32,
     gopher_index: i32,
-    // spawn_timer: Timer,
+    spawn_timer: Timer,
 }
 
 impl Default for GameState {
@@ -17,7 +18,9 @@ impl Default for GameState {
             high_score: 0,
             score: 0,
             gopher_index: 0,
-            // spawn_timer: Timer::from_seconds(1.0, false), // 초당 60프레임
+            // 첫 번째 매개변수는 카운트다운 할 초의 수 이고,
+            // 두 번째 매개변수는 타이머가 반복되는 여부입니다.
+            spawn_timer: Timer::from_seconds(2.0, true),
         }
     }
 }
@@ -188,12 +191,30 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
         if let Some(mouse_location) = engine.mouse_state.location() {
             let label = format!("gopher{}", game_state.gopher_index);
             game_state.gopher_index += 1;
-            let car1 = engine.add_sprite(label.clone(), "gopher.png");
+            let gopher = engine.add_sprite(label.clone(), "gopher.png");
             // 왼쪽버튼을 누른 마우스의 현재위치
-            car1.translation = mouse_location;
-            car1.collision = true;
-            car1.scale = 0.3;
+            gopher.translation = mouse_location;
+            gopher.collision = true;
+            gopher.scale = 0.3;
         }
+    }
+
+    // spawn
+    // tick() 메소드는 지나간 기간을 취하는데, 이것이 바로 engine.delta의 목적입니다.
+    // 타이머를 작동시키지 많으면 사실상 일시 중지된 것입니다.
+    // tick()은 불변 참조자를 타이머에 리턴하므로 to_finished() 또는 just_finished() 메소드를 연결하여
+    // 타이머가 완료되었거나 이 프레임 동안 타이머가 완료되었는지 확인할 수 있습니다.
+    if game_state.spawn_timer.tick(engine.delta).just_finished() {
+        let label = format!("gopher{}", game_state.gopher_index);
+        game_state.gopher_index += 1;
+        let gopher = engine.add_sprite(label.clone(), "gopher.png");
+        // random spawn
+        // x의 범위는 (-550.0..550.0)
+        // y의 범위는 (-325.0..325.0)
+        gopher.translation.x = thread_rng().gen_range(-550.0..550.0);
+        gopher.translation.y = thread_rng().gen_range(-325.0..325.0);
+        gopher.collision = true;
+        gopher.scale = 0.3;
     }
 
     // Reset score
