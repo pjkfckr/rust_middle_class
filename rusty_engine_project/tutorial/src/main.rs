@@ -25,6 +25,15 @@ impl Default for GameState {
 fn main() {
     let mut game = Game::new();
 
+    // 음소거인 0.0 과 가장 높은 볼륨인 1.0 사이
+    // 음악을 종료하려면 stop_music() 메서드 사용
+    // 최소 12개의 음향 효과가 동시에 재생될 수 있습니다.
+    // 정확한 수는 로컬 머신에서 사용할 수 있는 특정 하드웨어에 따라 다릅니다.
+    // 음향 효과는 파이어 앤 포켓 방식으로 재생되고 사용 가능한 경우 각각 별도의 채널에서 재생되며
+    // 오디오 소스의 마지막에 도달하면 종료 됩니다.
+    game.audio_manager
+        .play_music(MusicPreset::MysteriousMagic, 0.1);
+
     // 스프라이트에는 label이 있습니다.
     let player = game.add_sprite("player", SpritePreset::RacingCarBlue);
     // 위치 지정
@@ -120,6 +129,11 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
                 let high_score = engine.texts.get_mut("high_score").unwrap();
                 high_score.value = format!("High Score: {}", game_state.high_score);
             }
+            // play_sfx() 메소드가 하나의 음향효과를 재생합니다.
+            // 첫 번째 매개변수는 SfxPreset Enum 또는 에셋 디렉토리와 관련된 파일 경로여야 합니다
+            // 두 번째 매개변수는 음악과 같이 0.0 과 1.0사이의 값에 해당하는 볼륨입니다.
+            // 음악 재생을 중지하는 메소드가 있지만, 음향 효과가 시작되면 상호 작용할 방법은 없습니다.
+            engine.audio_manager.play_sfx(SfxPreset::Minimize1, 0.1);
         }
     }
 
