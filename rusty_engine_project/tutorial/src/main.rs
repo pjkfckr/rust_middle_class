@@ -28,6 +28,13 @@ impl Default for GameState {
 fn main() {
     let mut game = Game::new();
 
+    // BEVY 에서 바로 WindowDescriptor 구조체를 가져오는
+    // window_settings를 설정하는 기능입니다.
+    game.window_settings(WindowDescriptor {
+        title: "Tutorial!".to_string(),
+        ..Default::default()
+    });
+
     // 음소거인 0.0 과 가장 높은 볼륨인 1.0 사이
     // 음악을 종료하려면 stop_music() 메서드 사용
     // 최소 12개의 음향 효과가 동시에 재생될 수 있습니다.
@@ -77,6 +84,44 @@ fn main() {
 }
 
 fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
+    // game_logic() 함수에 입력된 engine 매개변수는
+    // engine 구조체에 대한 가변 참조자 입니다.
+    // should_exit field
+    // 이는 rusty_engine이 frame 끝에서 깔끔하게 종료되도록 true로 설정할 수 있습니다.
+    // 창의 테두리에 있는 창 닫기 컨트롤을 누르거나 esc 키를 누르면 종료됩니다.
+    // Q키를 눌렀을때 종료되도록 만드는 방법또한 있습니다.
+    if engine.keyboard_state.just_pressed(KeyCode::Q) {
+        engine.should_exit = true;
+    }
+    // time_since_startup_f64
+    // 64bit 부동 소수점 값으로 게임 시작 이후 경과 시간을 추적합니다.
+    // 이는 주기적인 애니메이션에 유용합니다. 상하 또는 좌우로 흔들리거나 원을 그리머 움직이는 애니메이션에 적용할 수 있습니다.
+    // 64bit 값을 가져와서 cosine 또는 sine에 입력한 다음, 어느 정도 스케일링을 해서
+    // 어떤 값에 추가해야 합니다.
+    // 예를 들어, 정규 score 텍스트를 위아래로 약간 움직여 볼 수 있는데
+    // 이를 실행하려면 시작한 이후의 시간을 기준으로 오프셋을 계산해야 합니다.
+    // 그 다음 y 값에 추가하면 되죠
+    // cos()의 출력은 -1과 1의 사이가 됩니다
+    // 이를 10으로 곱하면 -10과 10 사이를 구할 수 있겠죠
+    // 그 다음 engine 에서 사용할 수 있도록 이를 f32로 변환합니다
+    let offset = ((engine.time_since_startup_f64 * 2.0).cos() * 3.0) as f32;
+
+    // window_dimensions field
+    // 논리적 픽셀에서 창의 너비와 높이를 설명하는 Vec2입니다.
+    // 화면의 중앙이 (0, 0)이기떄문에 화면의 변은 반으로 나눈 window_dimensions 입니다
+    // High Score나 Score 텍스트가 창을 늘리거나 줄여도 창 크기에 비례하여 이동하도록 수정
+    let score = engine.texts.get_mut("score").unwrap();
+    // window_dimensions 의 x 를 2로 나누고 약 80픽셀을 빼기
+    score.translation.x = engine.window_dimensions.x / 2.0 - 80.0;
+    // window_dimensions 의 y 를 2로 나누고 약 30픽셀을 빼기
+    score.translation.y = engine.window_dimensions.y / 2.0 - 30.0 + offset;
+
+    let high_score = engine.texts.get_mut("high_score").unwrap();
+    // window_dimensions 의 -x 를 2로 나누고 약 110픽셀을 더하기
+    high_score.translation.x = -engine.window_dimensions.x / 2.0 + 110.0;
+    // window_dimensions 의 y 를 2로 나누고 약 30픽셀을 빼기
+    high_score.translation.y = engine.window_dimensions.y / 2.0 - 30.0;
+
     //handle collision
     // Collider 는 2개의 Sprite 간 충돌이 발생했는지 감지하는 데 사용되는 볼록 다각형입니다.
     // 화면에서 흰색 선이 있는 다각형으로 렌더링 됩니다
