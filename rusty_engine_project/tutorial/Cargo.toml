@@ -1,0 +1,20 @@
+[package]
+name = "tutorial"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rusty_engine = "5.2.1"
+
+# cargo run --release 를 실행하여 빌드합니다.
+# --release 를 매번 추가하기는 싫지만 같은 성능을 원하는 경우에는 아래와 같이 작성합니다
+# dev profile 과 release profile이 동일하게 설정됩니다
+[profile.dev]
+opt-level = 3
+debug = false
+debug-assertions = false
+overflow-checks = false
+incremental = false
+codegen-units = 16
