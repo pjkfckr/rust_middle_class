@@ -5,8 +5,8 @@ use rusty_engine::prelude::*;
 // 그곳은 바로 게임 상태 구조체 입니다
 // 자신의 게임 상태에 사용할 구조체를 제공할 수 있죠
 struct GameState {
-    // high_score: u32,
-    current_score: u32,
+    high_score: u32,
+    score: u32,
     gopher_index: i32,
     // spawn_timer: Timer,
 }
@@ -14,8 +14,8 @@ struct GameState {
 impl Default for GameState {
     fn default() -> Self {
         Self {
-            // high_score: 0,
-            current_score: 0,
+            high_score: 0,
+            score: 0,
             gopher_index: 0,
             // spawn_timer: Timer::from_seconds(1.0, false), // 초당 60프레임
         }
@@ -50,6 +50,12 @@ fn main() {
     // let temporary = game.add_sprite("temporary", SpritePreset::RacingCarRed);
     // temporary.translation = Vec2::new(30.0, 0.0);
     // temporary.layer = 1.1;
+
+    let score = game.add_text("score", "Score: 0");
+    score.translation = Vec2::new(520.0, 320.0);
+
+    let high_score = game.add_text("high_score", "High Score: 0");
+    high_score.translation = Vec2::new(-520.0, 320.0);
 
     // 2개 이상의 게임 로직을 가질 수 있습니다.
     // 로직이 추가되는 순서가 실행되는 순서가 됩니다.
@@ -106,8 +112,14 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
                 }
             }
             // 점수 += 1
-            game_state.current_score += 1;
-            println!("Current Score: {}", game_state.current_score);
+            game_state.score += 1;
+            let score = engine.texts.get_mut("score").unwrap();
+            score.value = format!("Score: {}", game_state.score);
+            if game_state.score > game_state.high_score {
+                game_state.high_score = game_state.score;
+                let high_score = engine.texts.get_mut("high_score").unwrap();
+                high_score.value = format!("High Score: {}", game_state.high_score);
+            }
         }
     }
 
@@ -168,5 +180,12 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
             car1.collision = true;
             car1.scale = 0.3;
         }
+    }
+
+    // Reset score
+    if engine.keyboard_state.just_pressed(KeyCode::R) {
+        game_state.score = 0;
+        let score = engine.texts.get_mut("score").unwrap();
+        score.value = "Score: 0".to_string();
     }
 }
