@@ -26,5 +26,5 @@ fn main() {
     let mut game = Game::new();
 
     // setup game here
-    game.run(GameState::default);
+    game.run(GameState::default());
 }
