@@ -64,6 +64,7 @@ fn main() {
 }
 
 fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
+    //handle collision
     // Collider 는 2개의 Sprite 간 충돌이 발생했는지 감지하는 데 사용되는 볼록 다각형입니다.
     // 화면에서 흰색 선이 있는 다각형으로 렌더링 됩니다
     // Collider는 Sprite가 사용하는 이미지 파일과 동일한 파일명 및 경로를 가진 파일에 저장됩니다.
@@ -115,10 +116,48 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
         }
     }
 
+    // handle movement
     // 플레이어를 움직이려면 이에 대한 가변 참조자를 구해야 합니다.
     // 해당 가변 참조자는 Sprite HashMap에 있는데 unwrap 이 가능합니다.
     // 우리는 항상 그곳에 있다는 것을 알고있기 때문입니다.
     let player = engine.sprites.get_mut("player").unwrap();
-    // 상수에 delta_f32 값을 곱해서 부드러운 움직임을 구현
-    player.translation.x += 100.0 * engine.delta_f32;
+    // 가로 = x, 세로 = y
+    const MOVEMENT_SPEED: f32 = 100.0;
+    // 방향키 뿐만 아니라 WASD로도 이동하는 로직 추가
+    //
+    // Up or W 입력시 위로 이동
+    if engine
+        .keyboard_state
+        .pressed_any(&[KeyCode::Up, KeyCode::W])
+    {
+        // 위로 이동하려면 양수인 y가 필요
+        player.translation.y += MOVEMENT_SPEED * engine.delta_f32;
+    }
+
+    // Down or S 입력시 아래로 이동
+    if engine
+        .keyboard_state
+        .pressed_any(&[KeyCode::Down, KeyCode::S])
+    {
+        // 위로 이동하려면 양수인 y가 필요
+        player.translation.y -= MOVEMENT_SPEED * engine.delta_f32;
+    }
+
+    // Right or D 입력시 오른쪽으로 이동
+    if engine
+        .keyboard_state
+        .pressed_any(&[KeyCode::Right, KeyCode::D])
+    {
+        // 위로 이동하려면 양수인 y가 필요
+        player.translation.x += MOVEMENT_SPEED * engine.delta_f32;
+    }
+
+    // Left or A 입력시 왼쪽으로 이동
+    if engine
+        .keyboard_state
+        .pressed_any(&[KeyCode::Left, KeyCode::A])
+    {
+        // 위로 이동하려면 양수인 y가 필요
+        player.translation.x -= MOVEMENT_SPEED * engine.delta_f32;
+    }
 }
